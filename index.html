@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UnixSuite | Advanced Linux & POSIX System Programming Lab</title>
+  <meta name="description" content="Professional, educational, and interactive Unix/Linux system programming explorer, terminal emulator, memory visualizer, and concurrency lab.">
+  
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Navigation -->
+    <header class="top-nav">
+      <div class="brand-section">
+        <div class="logo-badge">UX</div>
+        <div class="brand-info">
+          <h1>UnixSuite <span class="version-chip">v2.0 Visual Lab</span></h1>
+          <div class="tagline">Advanced Linux System Programming & Kernel Interface Toolkit</div>
+        </div>
+      </div>
+      
+      <div class="nav-actions">
+        <div class="status-indicator">
+          <span class="pulse-dot"></span>
+          <span>POSIX Kernel Online</span>
+        </div>
+        <button class="btn-icon" id="theme-toggle-btn" title="Toggle Theme">
+          <span id="theme-icon">☀️</span> <span id="theme-text">Light</span>
+        </button>
+        <button class="btn-primary" id="open-terminal-btn">
+          <span>⚡</span> Live Terminal
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Grid Layout -->
+    <div class="main-content">
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar">
+        <div>
+          <div class="nav-group-title">Interactive Modules</div>
+          <nav class="nav-links">
+            <a class="nav-item active" data-tab="dashboard">
+              <span class="nav-icon">📊</span>
+              <span>Overview & Metrics</span>
+            </a>
+            <a class="nav-item" data-tab="terminal">
+              <span class="nav-icon">💻</span>
+              <span>UnixSuite Terminal</span>
+              <span class="nav-badge">CLI</span>
+            </a>
+            <a class="nav-item" data-tab="system-info">
+              <span class="nav-icon">🖥️</span>
+              <span>System & Hardware</span>
+            </a>
+            <a class="nav-item" data-tab="processes">
+              <span class="nav-icon">⚡</span>
+              <span>Process Manager</span>
+              <span class="nav-badge">fork/exec</span>
+            </a>
+            <a class="nav-item" data-tab="file-system">
+              <span class="nav-icon">📁</span>
+              <span>VFS & File Descriptors</span>
+            </a>
+            <a class="nav-item" data-tab="ipc">
+              <span class="nav-icon">🔄</span>
+              <span>IPC & Signals</span>
+            </a>
+            <a class="nav-item" data-tab="memory">
+              <span class="nav-icon">🧠</span>
+              <span>Virtual Memory & Maps</span>
+            </a>
+            <a class="nav-item" data-tab="concurrency">
+              <span class="nav-icon">🧵</span>
+              <span>Concurrency & Mutex</span>
+              <span class="nav-badge">Race Lab</span>
+            </a>
+          </nav>
+        </div>
+
+        <div>
+          <div class="nav-group-title">Learning & Tools</div>
+          <nav class="nav-links">
+            <a class="nav-item" data-tab="quiz">
+              <span class="nav-icon">🎓</span>
+              <span>POSIX Knowledge Quiz</span>
+            </a>
+            <a class="nav-item" data-tab="code-viewer">
+              <span class="nav-icon">📜</span>
+              <span>C Source Code Explorer</span>
+            </a>
+          </nav>
+        </div>
+
+        <div class="sidebar-footer">
+          <div style="font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">Review 2 Edition</div>
+          <div>POSIX C99 Backend + Interactive Visual Frontend</div>
+        </div>
+      </aside>
+
+      <!-- Central Workspace -->
+      <main class="workspace" id="workspace-content">
+        <!-- Content will be dynamically rendered / displayed by tab -->
+        
+        <!-- Tab 1: Dashboard Overview -->
+        <section id="tab-dashboard" class="tab-pane fade-in">
+          <div class="module-header">
+            <div class="module-title-area">
+              <h2><span>🚀</span> UnixSuite Architecture & System Programming Hub</h2>
+              <p>An integrated educational suite demonstrating POSIX system calls, Linux kernel abstractions, process lifecycle, virtual memory, and multithreading.</p>
+            </div>
+            <div class="module-actions">
+              <button class="btn-secondary" onclick="switchTab('terminal')">Launch Terminal</button>
+              <button class="btn-primary" onclick="switchTab('concurrency')">Run Mutex Simulator</button>
+            </div>
+          </div>
+
+          <!-- Quick Metrics Banner -->
+          <div class="grid-4" style="margin-bottom: 1.5rem;">
+            <div class="metric-box">
+              <div class="metric-label">Operating System</div>
+              <div class="metric-val" id="dash-os">Linux 6.6 POSIX</div>
+              <div class="metric-sub">Kernel uname() Interface</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-label">Online CPU Cores</div>
+              <div class="metric-val" id="dash-cores">16 Cores</div>
+              <div class="metric-sub">sysconf(_SC_NPROCESSORS_ONLN)</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-label">Memory Page Size</div>
+              <div class="metric-val" id="dash-pagesize">4096 B (4 KB)</div>
+              <div class="metric-sub">sysconf(_SC_PAGESIZE)</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-label">Active Modules</div>
+              <div class="metric-val" style="color: var(--accent-emerald);">6 Modules</div>
+              <div class="metric-sub">All C Subsystems Linked</div>
+            </div>
+          </div>
+
+          <!-- 6 Core Pillars Grid -->
+          <div class="grid-3" style="margin-bottom: 1.5rem;">
+            <!-- Card 1 -->
+            <div class="glass-panel" style="cursor: pointer;" onclick="switchTab('system-info')">
+              <div class="card-header">
+                <div class="card-title"><span>🖥️</span> System Info</div>
+                <span class="cmd-pill">system-info</span>
+              </div>
+              <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1rem;">
+                Queries Linux kernel metadata via <code>uname()</code> and retrieves hardware architecture, CPU topologies, and physical memory limits via <code>sysconf()</code>.
+              </p>
+              <div class="edu-callout">
+                <div class="edu-title">POSIX APIs</div>
+                <div class="edu-desc"><code>uname()</code>, <code>sysconf(_SC_PHYS_PAGES)</code></div>
+              </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="glass-panel" style="cursor: pointer;" onclick="switchTab('processes')">
+              <div class="card-header">
+                <div class="card-title"><span>⚡</span> Process Lifecycle</div>
+                <span class="cmd-pill">processes</span>
+              </div>
+              <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1rem;">
+                Explores Linux process creation using <code>fork()</code>, address space overlay using <code>exec()</code>, and process synchronization via <code>waitpid()</code>.
+              </p>
+              <div class="edu-callout purple">
+                <div class="edu-title">POSIX APIs</div>
+                <div class="edu-desc"><code>fork()</code>, <code>execlp()</code>, <code>waitpid()</code></div>
+              </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="glass-panel" style="cursor: pointer;" onclick="switchTab('file-system')">
+              <div class="card-header">
+                <div class="card-title"><span>📁</span> Virtual File System</div>
+                <span class="cmd-pill">file-info</span>
+              </div>
+              <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1rem;">
+                Deep dives into file descriptors, inode metadata inspection via <code>stat()</code>, atomic creation flags <code>O_CREAT|O_EXCL</code>, and stream I/O buffers.
+              </p>
+              <div class="edu-callout emerald">
+                <div class="edu-title">POSIX APIs</div>
+                <div class="edu-desc"><code>open()</code>, <code>read()</code>, <code>close()</code>, <code>stat()</code></div>
+              </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="glass-panel" style="cursor: pointer;" onclick="switchTab('ipc')">
+              <div class="card-header">
+                <div class="card-title"><span>🔄</span> IPC & Signals</div>
+                <span class="cmd-pill">ipc-demo</span>
+              </div>
+              <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1rem;">
+                Unidirectional kernel pipes across parent/child boundaries, asynchronous signal delivery via <code>sigaction()</code>, and process signaling with <code>kill()</code>.
+              </p>
+              <div class="edu-callout amber">
+                <div class="edu-title">POSIX APIs</div>
+                <div class="edu-desc"><code>pipe()</code>, <code>sigaction()</code>, <code>kill()</code></div>
+              </div>
+            </div>
+
+            <!-- Card 5 -->
+            <div class="glass-panel" style="cursor: pointer;" onclick="switchTab('memory')">
+              <div class="card-header">
+                <div class="card-title"><span>🧠</span> Virtual Memory</div>
+                <span class="cmd-pill">memory-info</span>
+              </div>
+              <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1rem;">
+                Parses <code>/proc/self/status</code> and <code>/proc/self/maps</code> to reveal virtual address spaces, resident set size (RSS), text/data/bss/heap/stack layouts.
+              </p>
+              <div class="edu-callout">
+                <div class="edu-title">POSIX & ProcFS</div>
+                <div class="edu-desc"><code>/proc/self/status</code>, <code>/proc/self/maps</code></div>
+              </div>
+            </div>
+
+            <!-- Card 6 -->
+            <div class="glass-panel" style="cursor: pointer;" onclick="switchTab('concurrency')">
+              <div class="card-header">
+                <div class="card-title"><span>🧵</span> Concurrency & Mutex</div>
+                <span class="cmd-pill">thread-demo</span>
+              </div>
+              <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1rem;">
+                POSIX threads (pthreads) operating on shared counters. Simulates critical sections, mutex locks, and race conditions when locks are bypassed.
+              </p>
+              <div class="edu-callout purple">
+                <div class="edu-title">POSIX APIs</div>
+                <div class="edu-desc"><code>pthread_create()</code>, <code>pthread_mutex_lock()</code></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 2: Terminal Emulator -->
+        <section id="tab-terminal" class="tab-pane fade-in" style="display: none;">
+          <div class="module-header">
+            <div class="module-title-area">
+              <h2><span>💻</span> UnixSuite Interactive Terminal Emulator</h2>
+              <p>Execute real POSIX commands, explore UnixSuite backend responses, and trace real-time internal kernel calls.</p>
+            </div>
+            <div class="module-actions">
+              <button class="btn-icon" onclick="clearTerminal()"><span>🧹</span> Clear</button>
+              <button class="btn-icon" onclick="insertCommand('help')"><span>❓</span> Help</button>
+            </div>
+          </div>
+
+          <div class="terminal-window">
+            <div class="terminal-titlebar">
+              <div class="terminal-controls">
+                <span class="window-btn btn-close"></span>
+                <span class="window-btn btn-min"></span>
+                <span class="window-btn btn-max"></span>
+              </div>
+              <div class="terminal-title"><span>🐧</span> bash — unixsuite (x86_64-pc-linux-gnu)</div>
+              <div style="font-size: 0.72rem; color: var(--text-dim); font-family: var(--font-mono);">TTY: /dev/pts/0</div>
+            </div>
+
+            <div class="terminal-body" id="terminal-output">
+===============================================
+          ADVANCED UNIX UTILITY SUITE         
+===============================================
+ Integrated Linux System Programming Toolkit
+ Type 'help' to see available commands.
+ Type 'exit' to quit.
+===============================================
+
+UnixSuite > <span style="color: var(--accent-cyan); animation: pulse 1s infinite;">_</span>
+            </div>
+
+            <div class="quick-commands">
+              <span style="font-size: 0.72rem; color: var(--text-dim); align-self: center; margin-right: 4px;">Quick Actions:</span>
+              <button class="cmd-pill" onclick="runCommand('system-info')">system-info</button>
+              <button class="cmd-pill" onclick="runCommand('processes')">processes</button>
+              <button class="cmd-pill" onclick="runCommand('file-info test.txt')">file-info test.txt</button>
+              <button class="cmd-pill" onclick="runCommand('read-file test.txt')">read-file test.txt</button>
+              <button class="cmd-pill" onclick="runCommand('create-file demo.log')">create-file demo.log</button>
+              <button class="cmd-pill" onclick="runCommand('ipc-demo')">ipc-demo</button>
+              <button class="cmd-pill" onclick="runCommand('signal-demo')">signal-demo</button>
+              <button class="cmd-pill" onclick="runCommand('memory-info')">memory-info</button>
+              <button class="cmd-pill" onclick="runCommand('memory-maps')">memory-maps</button>
+              <button class="cmd-pill" onclick="runCommand('thread-demo')">thread-demo</button>
+              <button class="cmd-pill" onclick="runCommand('help')">help</button>
+              <button class="cmd-pill" onclick="runCommand('clear')">clear</button>
+            </div>
+
+            <form class="terminal-prompt-line" id="terminal-form" onsubmit="handleTerminalSubmit(event)">
+              <span class="prompt-tag">UnixSuite &gt;</span>
+              <input type="text" id="terminal-input" class="terminal-input" autocomplete="off" autofocus placeholder="Type command (e.g. system-info, processes, thread-demo)...">
+            </form>
+          </div>
+        </section>
+
+        <!-- Tab 3: System Info & Hardware Visualizer -->
+        <section id="tab-system-info" class="tab-pane fade-in" style="display: none;">
+          <div class="module-header">
+            <div class="module-title-area">
+              <h2><span>🖥️</span> System Information & Architecture</h2>
+              <p>Hardware discovery and kernel telemetry using <code>uname()</code> and POSIX <code>sysconf()</code>.</p>
+            </div>
+            <div class="module-actions">
+              <button class="btn-primary" onclick="refreshSysInfo()"><span>🔄</span> Query Kernel</button>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <!-- Left: System Details Card -->
+            <div class="glass-panel">
+              <div class="card-header">
+                <div class="card-title"><span>🐧</span> Operating System & Kernel Data</div>
+                <span class="cmd-pill">struct utsname</span>
+              </div>
+              
+              <table class="vfs-table" style="margin-bottom: 1rem;">
+                <tbody>
+                  <tr>
+                    <td style="color: var(--text-muted); width: 35%;">System Name (sysname)</td>
+                    <td style="font-weight: 600; color: var(--accent-cyan);" id="sys-name">Linux</td>
+                  </tr>
+                  <tr>
+                    <td style="color: var(--text-muted);">Node Name (nodename)</td>
+                    <td style="font-weight: 600;" id="sys-node">unixsuite-workstation</td>
+                  </tr>
+                  <tr>
+                    <td style="color: var(--text-muted);">Kernel Release (release)</td>
+                    <td style="font-weight: 600; color: var(--accent-purple);" id="sys-release">6.6.137-microsoft-standard-WSL2</td>
+                  </tr>
+                  <tr>
+                    <td style="color: var(--text-muted);">Kernel Version</td>
+                    <td style="font-weight: 600; font-size: 0.75rem;" id="sys-version">#1 SMP PREEMPT_DYNAMIC GNU/Linux</td>
+                  </tr>
+                  <tr>
+                    <td style="color: var(--text-muted);">Architecture (machine)</td>
+                    <td style="font-weight: 600; color: var(--accent-emerald);" id="sys-arch">x86_64 (64-bit AMD/Intel)</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div class="edu-callout">
+                <div class="edu-title">How <code>uname(&info)</code> Works</div>
+                <div class="edu-desc">
+                  The C function populates a <code>struct utsname</code> containing system identification buffers directly from the running kernel ring.
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: CPU & Memory Configuration -->
+            <div class="glass-panel">
+              <div class="card-header">
+                <div class="card-title"><span>⚡</span> CPU & Page Configuration</div>
+                <span class="cmd-pill">sysconf()</span>
+              </div>
+
+              <div class="grid-2" style="margin-bottom: 1rem;">
+                <div class="metric-box">
+                  <div class="metric-label">Online CPU Cores</div>
+                  <div class="metric-val" id="cpu-cores-val">16</div>
+                  <div class="metric-sub">_SC_NPROCESSORS_ONLN</div>
+                </div>
+                <div class="metric-box">
+                  <div class="metric-label">Memory Page Size</div>
+                  <div class="metric-val" id="page-size-val">4096 B</div>
+                  <div class="metric-sub">_SC_PAGESIZE</div>
+                </div>
+              </div>
+
+              <div class="metric-box" style="margin-bottom: 1rem;">
+                <div class="metric-label">Calculated Physical RAM</div>
+                <div class="metric-val" style="color: var(--accent-purple);" id="calc-ram-val">16.00 GB</div>
+                <div class="metric-sub"><code>(page_size * physical_pages) / (1024^3)</code></div>
+              </div>
+
+              <div class="edu-callout purple">
+                <div class="edu-title">POSIX <code>sysconf()</code> Parameter Reference</div>
+                <div class="edu-desc">
+                  <code>_SC_NPROCESSORS_ONLN</code>: Available logical processors for scheduling.<br>
+                  <code>_SC_PHYS_PAGES</code>: Total physical pages allocated to system memory.
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 4: Process Lifecycle Simulator -->
+        <section id="tab-processes" class="tab-pane fade-in" style="display: none;">
+          <div class="module-header">
+            <div class="module-title-area">
+              <h2><span>⚡</span> Process Lifecycle & POSIX Management</h2>
+              <p>Visual demonstration of <code>fork()</code> cloning, <code>exec()</code> binary loading, and <code>waitpid()</code> synchronization.</p>
+            </div>
+            <div class="module-actions">
+              <button class="btn-primary" onclick="simulateProcessFlow()"><span>▶</span> Step-by-Step Simulation</button>
+              <button class="btn-secondary" onclick="resetProcessFlow()"><span>🔄</span> Reset</button>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <!-- Left: Interactive Flow Stepper -->
+            <div class="glass-panel">
+              <div class="card-header">
+                <div class="card-title"><span>🔄</span> Execution Timeline</div>
+                <span class="cmd-pill" id="sim-status-pill">Ready to Fork</span>
+              </div>
+
+              <div class="process-flow-container">
+                <div class="flow-step-box" id="step-1-box">
+                  <div class="step-number">1</div>
+                  <div class="step-info">
+                    <h4>Step 1: fork() System Call</h4>
+                    <p>Parent process (PID: <span id="parent-pid-txt">4012</span>) forks an identical copy. Returns Child PID to Parent, and <code>0</code> to Child.</p>
+                  </div>
+                </div>
+
+                <div class="flow-step-box" id="step-2-box">
+                  <div class="step-number">2</div>
+                  <div class="step-info">
+                    <h4>Step 2: execlp() Image Replacement</h4>
+                    <p>Child process (PID: <span id="child-pid-txt">4013</span>) replaces its text & data segment with the <code>echo</code> binary program.</p>
+                  </div>
+                </div>
+
+                <div class="flow-step-box" id="step-3-box">
+                  <div class="step-number">3</div>
+                  <div class="step-info">
+                    <h4>Step 3: waitpid() & Exit Status</h4>
+                    <p>Parent blocks on <code>waitpid()</code> until child terminates with exit code <code>0</code> (WIFEXITED evaluated true).</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: State Diagram & Memory Clone Visualizer -->
+            <div class="glass-panel">
+              <div class="card-header">
+                <div class="card-title"><span>📊</span> Process Tree & PCB State</div>
+                <span class="cmd-pill">Process Control Block</span>
+              </div>
+
+              <div class="visualizer-canvas" style="flex-direction: column; gap: 1rem; align-items: stretch; justify-content: flex-start;">
+                <div style="display: flex; justify-content: space-around; width: 100%;">
+                  <!-- Parent Node -->
+                  <div style="background: rgba(56, 189, 248, 0.15); border: 2px solid var(--accent-cyan); border-radius: var(--radius-md); padding: 0.75rem; width: 45%; text-align: center;">
+                    <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.9rem;">Parent Process</div>
+                    <div style="font-family: var(--font-mono); font-size: 0.78rem; margin-top: 4px;">PID: <span id="pcb-parent-pid">4012</span> | PPID: 1000</div>
+                    <div style="font-size: 0.72rem; color: #34d399; margin-top: 4px;" id="parent-state-badge">STATE: RUNNING / WAIT</div>
+                  </div>
+
+                  <!-- Child Node -->
+                  <div id="child-node-box" style="background: rgba(168, 85, 247, 0.15); border: 2px dashed var(--accent-purple); border-radius: var(--radius-md); padding: 0.75rem; width: 45%; text-align: center; opacity: 0.5;">
+                    <div style="font-weight: 700; color: var(--accent-purple); font-size: 0.9rem;">Child Process</div>
+                    <div style="font-family: var(--font-mono); font-size: 0.78rem; margin-top: 4px;">PID: <span id="pcb-child-pid">4013</span> | PPID: 4012</div>
+                    <div style="font-size: 0.72rem; color: #f59e0b; margin-top: 4px;" id="child-state-badge">STATE: UNSPAWNED</div>
+                  </div>
+                </div>
+
+                <div class="code-viewer" style="margin-top: 0.5rem;">
+                  <div class="code-viewer-header">
+                    <span>process_manager.c (Core Fork Logic)</span>
+                    <span>C99 / POSIX</span>
+                  </div>
+                  <pre><code><span class="c-type">pid_t</span> pid = <span class="c-fn">fork</span>();
+<span class="c-kw">if</span> (pid == <span class="c-num">0</span>) {
+    <span class="c-fn">execlp</span>(<span class="c-str">"echo"</span>, <span class="c-str">"echo"</span>, <span class="c-str">"Hello Child"</span>, (<span class="c-type">char</span> *)NULL);
+    <span class="c-fn">_exit</span>(<span class="c-num">1</span>);
+} <span class="c-kw">else</span> {
+    <span class="c-fn">waitpid</span>(pid, &status, <span class="c-num">0</span>);
+}</code></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 5: File System & File Descriptors -->
+        <section id="tab-file-system" class="tab-pane fade-in" style="display: none;">
+          <div class="module-header">
+            <div class="module-title-area">
+              <h2><span>📁</span> Virtual File System & File Descriptors</h2>
+              <p>Explore POSIX file descriptor table, inode metadata with <code>stat()</code>, and raw byte stream I/O.</p>
+            </div>
+            <div class="module-actions">
+              <button class="btn-primary" onclick="createNewVirtualFile()"><span>➕</span> Create New File</button>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <!-- Left: Virtual Disk & FD Table -->
+            <div class="glass-panel">
+              <div class="card-header">
+                <div class="card-title"><span>📄</span> Active File Descriptor (FD) Table</div>
+                <span class="cmd-pill">Per-Process Table</span>
+              </div>
+
+              <table class="vfs-table" style="margin-bottom: 1rem;">
+                <thead>
+                  <tr>
+                    <th>FD</th>
+                    <th>Target / Stream</th>
+                    <th>Access Mode</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="fd-table-body">
+                  <tr>
+                    <td><span class="fd-badge fd-std">0</span></td>
+                    <td>/dev/pts/0 (Standard Input)</td>
+                    <td>O_RDONLY</td>
+                    <td style="color: var(--accent-emerald);">OPEN</td>
+                  </tr>
+                  <tr>
+                    <td><span class="fd-badge fd-std">1</span></td>
+                    <td>/dev/pts/0 (Standard Output)</td>
+                    <td>O_WRONLY</td>
+                    <td style="color: var(--accent-emerald);">OPEN</td>
+                  </tr>
+                  <tr>
+                    <td><span class="fd-badge fd-std">2</span></td>
+                    <td>/dev/pts/0 (Standard Error)</td>
+                    <td>O_WRONLY</td>
+                    <td style="color: var(--accent-emerald);">OPEN</td>
+                  </tr>
+                  <tr>
+                    <td><span class="fd-badge fd-user">3</span></td>
+                    <td>test.txt (Sample File)</td>
+                    <td>O_RDONLY</td>
+                    <td style="color: var(--accent-purple);">ACTIVE</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div class="card-title" style="margin: 1.25rem 0 0.5rem; font-size: 0.95rem;"><span>📂</span> Virtual Files in Working Directory</div>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;" id="file-pills-container">
+                <button class="cmd-pill" onclick="inspectFile('test.txt')">test.txt (851 B)</button>
+                <button class="cmd-pill" onclick="inspectFile('kernel.log')">kernel.log (1.2 KB)</button>
+                <button class="cmd-pill" onclick="inspectFile('data.bin')">data.bin (4.0 KB)</button>
+              </div>
+            </div>
+
+            <!-- Right: stat() Inode Inspector -->
+            <div class="glass-panel">
+              <div class="card-header">
+                <div class="card-title"><span>🔍</span> Inode & Metadata (stat)</div>
+                <span class="cmd-pill" id="inspect-filename">test.txt</span>
+              </div>
+
+              <div class="grid-2" style="margin-bottom: 1rem;">
+                <div class="metric-box">
+                  <div class="metric-label">File Size</div>
+                  <div class="metric-val" id="stat-size">851 B</div>
+                  <div class="metric-sub">st_size</div>
+                </div>
+                <div class="metric-box">
+                  <div class="metric-label">Octal Permissions</div>
+                  <div class="metric-val" id="stat-mode">0644</div>
+                  <div class="metric-sub">st_mode & 0777 (rw-r--r--)</div>
+                </div>
+                <div class="metric-box">
+                  <div class="metric-label">Owner UID / GID</div>
+                  <div class="metric-val" id="stat-uid">1000 : 1000</div>
+                  <div class="metric-sub">st_uid / st_gid</div>
+                </div>
+                <div class="metric-box">
+                  <div class="metric-label">Hard Links</div>
+                  <div class="metric-val" id="stat-links">1</div>
+                  <div class="metric-sub">st_nlink</div>
+                </div>
+              </div>
+
+              <div class="edu-callout emerald">
+                <div class="edu-title">File Operations Lifecycle</div>
+                <div class="edu-desc">
+                  1. <code>open()</code> creates file table entry & allocates lowest available FD.<br>
+                  2. <code>read()</code> / <code>write()</code> moves cursor in byte increments.<br>
+                  3. <code>close()</code> frees FD slot for reuse.
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 6: IPC & Signals Studio -->
+        <section id="tab-ipc" class="tab-pane fade-in" style="display: none;">
+          <div class="module-header">
+            <div class="module-title-area">
+              <h2><span>🔄</span> Inter-Process Communication & Signals</h2>
+              <p>Unidirectional kernel pipe streaming and POSIX <code>sigaction()</code> signal dispatching.</p>
+            </div>
+            <div class="module-actions">
+              <button class="btn-primary" onclick="simulatePipeTransmission()"><span>📡</span> Transmit via Pipe</button>
+              <button class="btn-secondary" onclick="sendDemoSignal('SIGUSR1')"><span>⚡</span> Send SIGUSR1</button>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <!-- Left: Pipe Channel Visualizer -->
+            <div class="glass-panel">
+              <div class="card-header">
+                <div class="card-title"><span>🚰</span> Kernel Pipe Buffer Channel</div>
+                <span class="cmd-pill">pipe(pipefd[2])</span>
+              </div>
+
+              <div class="visualizer-canvas" style="flex-direction: column; gap: 1rem;">
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                  <!-- Child Writer -->
+                  <div style="background: rgba(168, 85, 247, 0.2); border: 1px solid var(--accent-purple); padding: 0.75rem; border-radius: var(--radius-md); text-align: center; width: 30%;">
+                    <div style="font-weight: 700; color: var(--accent-purple); font-size: 0.85rem;">Child Writer</div>
+                    <div style="font-family: var(--font-mono); font-size: 0.75rem;">FD: pipefd[1] (Write)</div>
+                  </div>
+
+                  <!-- Pipe Stream Animation -->
+                  <div style="flex: 1; margin: 0 1rem; position: relative;">
+                    <div style="height: 24px; background: rgba(0, 240, 255, 0.1); border: 1px dashed var(--accent-cyan); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-family: var(--font-mono); color: var(--accent-cyan);" id="pipe-packet-display">
+                      Kernel Buffer (64 KB)
+                    </div>
+                  </div>
+
+                  <!-- Parent Reader -->
+                  <div style="background: rgba(56, 189, 248, 0.2); border: 1px solid var(--accent-cyan); padding: 0.75rem; border-radius: var(--radius-md); text-align: center; width: 30%;">
+                    <div style="font-weight: 700; color: var(--accent-cyan); font-size: 0.85rem;">Parent Reader</div>
+                    <div style="font-family: var(--font-mono); font-size: 0.75rem;">FD: pipefd[0] (Read)</div>
+                  </div>
+                </div>
+
+                <div class="edu-callout amber" style="width: 100%;">
+                  <div class="edu-title">Pipe Mechanism</div>
+                  <div class="edu-desc">
+                    <code>pipefd[0]</code> = Read End | <code>pipefd[1]</code> = Write End.<br>
+                    Data flows strictly in FIFO order through kernel ring memory without touching the physical disk.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Signal Generator -->
+            <div class="glass-panel">
+              <div class="card-header">
+                <div class="card-title"><span>🔔</span> POSIX Signal Dispatcher</div>
+                <span class="cmd-pill">sigaction() & kill()</span>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem;">
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                  <button class="cmd-pill" onclick="sendDemoSignal('SIGUSR1')" style="background: rgba(16, 185, 129, 0.2); border-color: var(--accent-emerald);">SIGUSR1 (User 1)</button>
+                  <button class="cmd-pill" onclick="sendDemoSignal('SIGINT')" style="background: rgba(245, 158, 11, 0.2); border-color: var(--accent-amber);">SIGINT (Interrupt)</button>
+                  <button class="cmd-pill" onclick="sendDemoSignal('SIGTERM')" style="background: rgba(239, 68, 68, 0.2); border-color: var(--accent-rose);">SIGTERM (Terminate)</button>
+                  <button class="cmd-pill" onclick="sendDemoSignal('SIGSEGV')">SIGSEGV (Segfault)</button>
+                </div>
+
+                <div class="metric-box">
+                  <div class="metric-label">Signal Handler State</div>
+                  <div class="metric-val" id="sig-handler-state" style="font-size: 1.1rem; color: var(--accent-emerald);">Registered: handle_sigusr1</div>
+                  <div class="metric-sub" id="sig-last-received">Last Received: None</div>
+                </div>
+              </div>
+
+              <div class="edu-callout">
+                <div class="edu-title">Why <code>sig_atomic_t</code>?</div>
+                <div class="edu-desc">
+                  Signals interrupt asynchronous execution at arbitrary instructions. Variables modified inside signal handlers must be declared <code>volatile sig_atomic_t</code> to guarantee atomic read/write.
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 7: Virtual Memory & Maps -->
+        <section id="tab-memory" class="tab-pane fade-in" style="display: none;">
+          <div class="module-header">
+            <div class="module-title-area">
+              <h2><span>🧠</span> Process Virtual Memory & /proc Maps</h2>
+              <p>Inspect process memory regions, VmRSS, VmSize, and Linux virtual address space segmentation.</p>
+            </div>
+            <div class="module-actions">
+              <button class="btn-primary" onclick="refreshMemoryStats()"><span>🔄</span> Refresh /proc/self</button>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <!-- Left: Virtual Address Space Stack -->
+            <div class="glass-panel">
+              <div class="card-header">
+                <div class="card-title"><span>📐</span> Linux Virtual Address Space Layout (x86_64)</div>
+                <span class="cmd-pill">0x00000000 -> 0xFFFFFFFF</span>
+              </div>
+
+              <div class="mem-stack-container">
+                <div class="mem-segment seg-kernel">
+                  <span>Kernel Space (Protected)</span>
+                  <span>0xFFFF800000000000</span>
+                </div>
+                <div class="mem-segment seg-stack">
+                  <span>Stack (Grows Downward ↓) [Local Variables, Frames]</span>
+                  <span>0x7FFF5F000000</span>
+                </div>
+                <div class="mem-segment seg-mmap">
+                  <span>Memory Mapping Segment (Shared Libs, libc.so)</span>
+                  <span>0x7F20A0000000</span>
+                </div>
+                <div class="mem-segment seg-heap">
+                  <span>Heap (Grows Upward ↑) [malloc(), brk()]</span>
+                  <span>0x55E81A000000</span>
+                </div>
+                <div class="mem-segment seg-bss">
+                  <span>BSS Segment (Uninitialized Globals)</span>
+                  <span>0x55E819000000</span>
+                </div>
+                <div class="mem-segment seg-data">
+                  <span>Data Segment (Initialized Globals)</span>
+                  <span>0x55E818000000</span>
+                </div>
+                <div class="mem-segment seg-text">
+                  <span>Text Segment (Executable Machine Code) [r-xp]</span>
+                  <span>0x55E817000000</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: /proc/self/status & Maps Inspector -->
+            <div class="glass-panel">
+              <div class="card-header">
+                <div class="card-title"><span>📊</span> /proc/self/status Metrics</div>
+                <span class="cmd-pill">Process Telemetry</span>
+              </div>
+
+              <div class="grid-2" style="margin-bottom: 1rem;">
+                <div class="metric-box">
+                  <div class="metric-label">VmPeak (Virtual Peak)</div>
+                  <div class="metric-val" id="mem-vmpeak">4,820 kB</div>
+                  <div class="metric-sub">Max Virtual Memory</div>
+                </div>
+                <div class="metric-box">
+                  <div class="metric-label">VmSize (Current Virtual)</div>
+                  <div class="metric-val" id="mem-vmsize">4,712 kB</div>
+                  <div class="metric-sub">Total Virtual Allocated</div>
+                </div>
+                <div class="metric-box">
+                  <div class="metric-label">VmRSS (Resident Set)</div>
+                  <div class="metric-val" id="mem-vmrss" style="color: var(--accent-emerald);">1,840 kB</div>
+                  <div class="metric-sub">Physical RAM in Use</div>
+                </div>
+                <div class="metric-box">
+                  <div class="metric-label">VmStk (Stack Size)</div>
+                  <div class="metric-val" id="mem-vmstk">132 kB</div>
+                  <div class="metric-sub">Current Process Stack</div>
+                </div>
+              </div>
+
+              <div class="edu-callout">
+                <div class="edu-title">Resident Set Size (RSS) vs Virtual Size</div>
+                <div class="edu-desc">
+                  <strong>VmSize</strong> is the address space requested by the process.<br>
+                  <strong>VmRSS</strong> is the actual physical RAM frames currently mapped into RAM by the Linux page table.
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 8: Concurrency & Mutex Race Lab -->
+        <section id="tab-concurrency" class="tab-pane fade-in" style="display: none;">
+          <div class="module-header">
+            <div class="module-title-area">
+              <h2><span>🧵</span> Concurrency, Threads & Mutex Synchronization Lab</h2>
+              <p>Simulate multithreaded execution with POSIX <code>pthread_create()</code>, test race conditions, and observe mutual exclusion.</p>
+            </div>
+            <div class="module-actions">
+              <button class="btn-primary" id="start-race-btn" onclick="startConcurrencySimulation()"><span>▶</span> Run Simulation</button>
+            </div>
+          </div>
+
+          <div class="race-sim-box">
+            <!-- Controls Bar -->
+            <div class="sim-controls">
+              <div class="toggle-container">
+                <label class="switch">
+                  <input type="checkbox" id="mutex-toggle" checked>
+                  <span class="slider-round"></span>
+                </label>
+                <div>
+                  <div style="font-weight: 700; font-size: 0.95rem;" id="mutex-state-label">Mutex Protection: ENABLED</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">pthread_mutex_lock(&counter_mutex) protects critical section</div>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 1rem; align-items: center;">
+                <div style="font-size: 0.85rem; color: var(--text-muted);">
+                  Iterations per thread: <strong style="color: var(--text-main);">100,000</strong>
+                </div>
+                <div style="font-size: 0.85rem; color: var(--text-muted);">
+                  Threads: <strong style="color: var(--accent-cyan);">2 Workers</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Progress & Live Threads -->
+            <div class="grid-2">
+              <div class="glass-panel">
+                <div class="card-header">
+                  <div class="card-title"><span>⚡</span> Thread 1 (Worker #1)</div>
+                  <span class="cmd-pill" id="t1-status">Idle</span>
+                </div>
+                <div class="thread-progress-bar" style="margin-bottom: 0.5rem;">
+                  <div class="thread-progress-fill" id="t1-progress"></div>
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between;">
+                  <span>Increments: <strong id="t1-count">0</strong> / 100,000</span>
+                  <span id="t1-lock-state" style="color: var(--accent-emerald);">Lock: Unlocked</span>
+                </div>
+              </div>
+
+              <div class="glass-panel">
+                <div class="card-header">
+                  <div class="card-title"><span>⚡</span> Thread 2 (Worker #2)</div>
+                  <span class="cmd-pill" id="t2-status">Idle</span>
+                </div>
+                <div class="thread-progress-bar" style="margin-bottom: 0.5rem;">
+                  <div class="thread-progress-fill" id="t2-progress" style="background: linear-gradient(90deg, var(--accent-purple), var(--accent-rose));"></div>
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between;">
+                  <span>Increments: <strong id="t2-count">0</strong> / 100,000</span>
+                  <span id="t2-lock-state" style="color: var(--accent-emerald);">Lock: Unlocked</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Result Counter Comparison -->
+            <div class="glass-panel" style="text-align: center; padding: 1.5rem;">
+              <div class="grid-3">
+                <div class="metric-box">
+                  <div class="metric-label">Expected Counter</div>
+                  <div class="metric-val" style="color: var(--accent-cyan);">200,000</div>
+                  <div class="metric-sub">(100,000 x 2 threads)</div>
+                </div>
+                <div class="metric-box">
+                  <div class="metric-label">Actual Counter Result</div>
+                  <div class="metric-val" id="actual-counter-val" style="color: var(--accent-emerald);">0</div>
+                  <div class="metric-sub" id="counter-diff-sub">Delta: 0</div>
+                </div>
+                <div class="metric-box">
+                  <div class="metric-label">Result Status</div>
+                  <div class="metric-val" id="race-outcome-val" style="font-size: 1.15rem; color: var(--text-muted);">Ready</div>
+                  <div class="metric-sub" id="race-outcome-sub">Click Run Simulation</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 9: POSIX Knowledge Quiz -->
+        <section id="tab-quiz" class="tab-pane fade-in" style="display: none;">
+          <div class="module-header">
+            <div class="module-title-area">
+              <h2><span>🎓</span> POSIX & Linux System Programming Quiz</h2>
+              <p>Test your knowledge on system calls, memory architecture, signals, and multithreading.</p>
+            </div>
+            <div class="module-actions">
+              <span class="cmd-pill" style="font-size: 0.9rem;" id="quiz-score-badge">Score: 0 / 0</span>
+            </div>
+          </div>
+
+          <div class="quiz-card" id="quiz-container">
+            <!-- Dynamic Quiz Content Loaded via JS -->
+          </div>
+        </section>
+
+        <!-- Tab 10: C Source Code Explorer -->
+        <section id="tab-code-viewer" class="tab-pane fade-in" style="display: none;">
+          <div class="module-header">
+            <div class="module-title-area">
+              <h2><span>📜</span> C Backend Source Code Explorer</h2>
+              <p>Line-by-line inspection of all C source files and POSIX implementation routines in UnixSuite.</p>
+            </div>
+            <div class="module-actions">
+              <select id="code-file-selector" class="cmd-pill" style="background: var(--bg-card); color: var(--accent-cyan); outline: none;" onchange="loadCodeFile(this.value)">
+                <option value="main.c">main.c (CLI REPL Loop)</option>
+                <option value="system_info.c">system_info.c (uname, sysconf)</option>
+                <option value="process_manager.c">process_manager.c (fork, exec, wait)</option>
+                <option value="file_system.c">file_system.c (open, read, stat)</option>
+                <option value="ipc.c">ipc.c (pipe, sigaction, kill)</option>
+                <option value="memory.c">memory.c (/proc/self status & maps)</option>
+                <option value="concurrency.c">concurrency.c (pthread, mutex)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="code-viewer" style="height: 520px; overflow-y: auto;">
+            <div class="code-viewer-header">
+              <span id="active-file-label">unixsuite/main.c</span>
+              <span>POSIX C99</span>
+            </div>
+            <pre><code id="source-code-display">// Select a file above to inspect its complete C source code...</code></pre>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Application Logic -->
+  <script src="app.js"></script>
+</body>
+</html>

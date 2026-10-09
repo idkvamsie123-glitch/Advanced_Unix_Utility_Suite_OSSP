@@ -1,0 +1,9 @@
+# Build artifacts
+*.o
+unixsuite/unixsuite
+unixsuite/*.o
+
+# OS and temporary files
+.DS_Store
+Thumbs.db
+*.log

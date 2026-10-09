@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced UNIX Utility Suite (UnixSuite) | 15-Slide Presentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #060911;
+      --bg-surface: #0b1120;
+      --card-bg: rgba(15, 23, 42, 0.85);
+      --card-border: rgba(56, 189, 248, 0.2);
+      --card-hover: rgba(30, 41, 59, 0.95);
+      --accent-cyan: #00f0ff;
+      --accent-blue: #38bdf8;
+      --accent-purple: #a855f7;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: 
+        radial-gradient(circle at 10% 15%, rgba(0, 240, 255, 0.07) 0%, transparent 45%),
+        radial-gradient(circle at 90% 85%, rgba(56, 189, 248, 0.06) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.03) 0%, transparent 55%);
+    }
+
+    /* Top presentation bar */
+    .pres-header {
+      padding: 0.6rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--card-border);
+      background: rgba(11, 17, 32, 0.9);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+
+    .brand-tag {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      letter-spacing: 0.05em;
+    }
+
+    .slide-progress {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--accent-blue);
+      background: rgba(56, 189, 248, 0.1);
+      padding: 3px 12px;
+      border-radius: 9999px;
+      border: 1px solid var(--card-border);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .btn-header {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 0.35rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-header:hover {
+      background: rgba(0, 240, 255, 0.15);
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+
+    /* Deck Viewport (16:9 Ratio Container) */
+    .deck-viewport {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem 2rem;
+      overflow: hidden;
+    }
+
+    .slide-container {
+      width: 100%;
+      max-width: 1180px;
+      aspect-ratio: 16 / 9;
+      max-height: calc(100vh - 140px);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 2.2rem 2.8rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 240, 255, 0.08);
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow-y: auto;
+      backdrop-filter: blur(16px);
+    }
+
+    .slide-container.active {
+      display: flex;
+      animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(12px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .slide-tag {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 0.35rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .slide-heading {
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+      background: linear-gradient(90deg, #ffffff 0%, var(--accent-blue) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .slide-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      font-size: 0.95rem;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+
+    /* Grid Layouts */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+    }
+
+    .card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .card h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .card p, .card ul {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    .card ul {
+      padding-left: 1.1rem;
+    }
+
+    /* Terminal & Code Blocks */
+    .terminal-box {
+      background: #040711;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: #e2e8f0;
+      line-height: 1.45;
+      overflow-x: auto;
+    }
+
+    .terminal-prompt {
+      color: var(--accent-cyan);
+      font-weight: 700;
+    }
+
+    .code-box {
+      background: #050814;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: #93c5fd;
+      line-height: 1.4;
+    }
+
+    /* Tables */
+    .pres-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .pres-table th {
+      background: rgba(56, 189, 248, 0.12);
+      color: var(--accent-cyan);
+      text-align: left;
+      padding: 0.55rem 0.75rem;
+      font-weight: 600;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .pres-table td {
+      padding: 0.5rem 0.75rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+    }
+
+    .pres-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text-main);
+    }
+
+    /* Diagrams & Flow Elements */
+    .flow-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+    }
+
+    .flow-node {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid var(--accent-blue);
+      padding: 0.35rem 0.65rem;
+      border-radius: 6px;
+      color: var(--text-main);
+      font-weight: 600;
+    }
+
+    .flow-arrow {
+      color: var(--accent-cyan);
+      font-weight: 700;
+    }
+
+    /* Speaker Notes Box */
+    .notes-drawer {
+      background: rgba(4, 8, 18, 0.95);
+      border: 1px solid var(--accent-amber);
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      font-size: 0.8rem;
+      color: #fde68a;
+      display: none;
+      margin-top: 0.5rem;
+      line-height: 1.45;
+    }
+
+    .notes-drawer.open {
+      display: block;
+    }
+
+    /* Footer Controls */
+    .pres-footer {
+      padding: 0.6rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--card-border);
+      background: rgba(11, 17, 32, 0.9);
+      z-index: 100;
+    }
+
+    .btn-nav {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 0.45rem 1.1rem;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s;
+    }
+
+    .btn-nav:hover:not(:disabled) {
+      background: var(--accent-cyan);
+      color: #040711;
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+    }
+
+    .btn-nav:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .key-tip {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header class="pres-header">
+    <div class="brand-tag">
+      <span>🐧</span> UNIXSUITE | ACADEMIC PROJECT EVALUATION
+    </div>
+    <div class="slide-progress" id="slide-indicator">Slide 1 / 15</div>
+    <div class="header-actions">
+      <button class="btn-header" id="toggle-notes-btn" onclick="toggleSpeakerNotes()">
+        <span>📝</span> Toggle Speaker Notes (S)
+      </button>
+      <a href="index.html" target="_blank" class="btn-header">
+        <span>🌐</span> Live Visual UI ↗
+      </a>
+    </div>
+  </header>
+
+  <!-- Deck Viewport -->
+  <main class="deck-viewport">
+
+    <!-- ===================================================================
+         SLIDE 1: TITLE SLIDE
+         =================================================================== -->
+    <div class="slide-container active" id="slide-1">
+      <div>
+        <div class="slide-tag"><span>⚡</span> OPERATING SYSTEMS & SYSTEM PROGRAMMING</div>
+        <h1 class="slide-heading" style="font-size: 2.3rem; margin-bottom: 0.4rem;">Advanced UNIX Utility Suite (UnixSuite)</h1>
+        <p style="font-size: 1.05rem; color: var(--accent-cyan); font-weight: 600;">
+          A Modular Linux System Programming Toolkit in C
+        </p>
+      </div>
+
+      <div class="grid-2" style="margin: 0.8rem 0;">
+        <div class="card" style="border-left: 3px solid var(--accent-cyan);">
+          <h4><span>👥</span> Student Team Members</h4>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; margin-top: 0.3rem; font-family: 'JetBrains Mono', monospace; font-size: 0.88rem; color: #e2e8f0;">
+            <div>• Roll No: <strong>2610030236</strong></div>
+            <div>• Roll No: <strong>2510030261</strong></div>
+            <div>• Roll No: <strong>2510030041</strong></div>
+            <div>• Roll No: <strong>2510030228</strong></div>
+          </div>
+          <div style="font-size: 0.78rem; color: var(--text-dim); margin-top: 0.4rem;">
+            Department of Computer Science and Engineering
+          </div>
+        </div>
+
+        <div class="card" style="border-left: 3px solid var(--accent-purple);">
+          <h4><span>🏛️</span> Academic Project Details</h4>
+          <p>• <strong>Course:</strong> Operating Systems / System Programming</p>
+          <p>• <strong>Institution:</strong> Department of Computer Science & Engineering</p>
+          <p>• <strong>Faculty Guide:</strong> Faculty Review Panel</p>
+          <p>• <strong>Core Subsystems:</strong> Processes, VFS, Pipes, Signals, Memory, Pthreads</p>
+        </div>
+      </div>
+
+      <div class="terminal-box" style="font-size: 0.74rem;">
+        <span class="terminal-prompt">unixsuite@linux:~$</span> ./unixsuite --version<br>
+        [INIT] Advanced UNIX Utility Suite v2.0 (POSIX C99 Backend + Interactive UI) Online.
+      </div>
+
+      <div class="notes-drawer" id="notes-1">
+        <strong>🗣️ Speaker Note (Slide 1):</strong> "Good morning, respected faculty members. Today we are presenting our project titled 'Advanced UNIX Utility Suite (UnixSuite)'. It is a modular, high-performance system programming toolkit implemented in C that demonstrates fundamental Linux and POSIX kernel abstractions through observable, real-time command execution."
+      </div>
+    </div>
+
+    <!-- ===================================================================
+         SLIDE 2: INTRODUCTION
+         =================================================================== -->
+    <div class="slide-container" id="slide-2">
+      <div>
+        <div class="slide-tag">PROJECT OVERVIEW</div>
+        <h2 class="slide-heading">Introduction & Concept Definition</h2>
+      </div>
+
+      <div class="slide-content">
+        <p style="font-size: 0.92rem;">
+          <strong>UnixSuite</strong> is a modular, menu-driven command-line toolkit developed in standard C99 that bridges the gap between theoretical operating system concepts and actual kernel execution.
+        </p>
+
+        <div class="grid-3">
+          <div class="card">
+            <h4><span>🐧</span> POSIX Interfaces</h4>
+            <p>Directly interfaces with Linux kernel system calls (C interfaces) rather than high-level third-party libraries.</p>
+          </div>
+          <div class="card">
+            <h4><span>🧩</span> Modular Design</h4>
+            <p>Decoupled modules with dedicated header (<code>.h</code>) declarations and implementation (<code>.c</code>) units.</p>
+          </div>
+          <div class="card">
+            <h4><span>🔍</span> Internal Telemetry</h4>
+            <p>Embedded <code>[INTERNAL WORKING]</code> tracing that explains kernel transitions for every user command.</p>
+          </div>
+        </div>
+
+        <div class="card" style="border-color: rgba(56, 189, 248, 0.3); background: rgba(56, 189, 248, 0.05);">
+          <h4><span>🎯</span> 6 Core System Programming Domains Covered</h4>
+          <div style="display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.3rem;">
+            <span class="flow-node" style="font-size: 0.72rem;">1. System Info (uname/sysconf)</span>
+            <span class="flow-node" style="font-size: 0.72rem;">2. Process Manager (fork/exec/wait)</span>
+            <span class="flow-node" style="font-size: 0.72rem;">3. VFS & Inodes (open/read/stat)</span>
+            <span class="flow-node" style="font-size: 0.72rem;">4. IPC & Pipes (pipe/read/write)</span>
+            <span class="flow-node" style="font-size: 0.72rem;">5. Memory Analysis (/proc/self)</span>
+            <span class="flow-node" style="font-size: 0.72rem;">6. Concurrency (pthreads/mutex)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="notes-drawer" id="notes-2">
+        <strong>🗣️ Speaker Note (Slide 2):</strong> "UnixSuite provides a structured command-line environment designed to explore six key pillars of operating systems. Rather than viewing system calls as black boxes, each module executes real POSIX operations and returns both standard output and detailed internal working messages for clear educational demonstration."
+      </div>
+    </div>
+
+    <!-- ===================================================================
+         SLIDE 3: PROBLEM STATEMENT
+         =================================================================== -->
+    <div class="slide-container" id="slide-3">
+      <div>
+        <div class="slide-tag">MOTIVATION & CHALLENGE</div>
+        <h2 class="slide-heading">Problem Statement</h2>
+      </div>
+
+      <div class="slide-content grid-2">
+        <div class="card" style="border-left: 3px solid var(--accent-rose);">
+          <h4 style="color: var(--accent-rose);"><span>❌</span> The Pedagogical Gap</h4>
+          <ul style="margin-top: 0.4rem; line-height: 1.6;">
+            <li><strong>Theory vs Execution:</strong> OS concepts like process cloning (<code>fork</code>), memory paging, and virtual file descriptors are taught abstractly in textbooks.</li>
+            <li><strong>Hidden Kernel Behavior:</strong> Standard terminal commands hide internal state changes, system call returns, and file descriptor indexing.</li>
+            <li><strong>Concurrency Hazards:</strong> Race conditions, critical sections, and mutual exclusion are difficult to observe without controlled simulations.</li>
+          </ul>
+        </div>
+
+        <div class="card" style="border-left: 3px solid var(--accent-emerald);">
+          <h4 style="color: var(--accent-emerald);"><span>✔</span> The UnixSuite Solution</h4>
+          <div class="flow-bar" style="margin: 0.4rem 0; flex-direction: column; align-items: stretch; gap: 0.4rem;">
+            <div style="text-align: center; font-weight: 700; color: var(--accent-cyan);">Theoretical POSIX Concept</div>
+            <div style="text-align: center; color: var(--accent-cyan);">⬇ [C99 Implementation]</div>
+            <div style="text-align: center; font-weight: 700; color: var(--accent-blue);">Direct Linux Kernel System Call</div>
+            <div style="text-align: center; color: var(--accent-cyan);">⬇ [State Capture]</div>
+            <div style="text-align: center; font-weight: 700; color: var(--accent-emerald);">Observable Output & Internal Telemetry</div>
+          </div>
+          <p style="font-size: 0.8rem; margin-top: 0.3rem;">Unifies all demonstrations into one structured, maintainable, and interactive codebase.</p>
+        </div>
+      </div>
+
+      <div class="notes-drawer" id="notes-3">
+        <strong>🗣️ Speaker Note (Slide 3):</strong> "Operating systems courses often focus heavily on textbook theory without providing students with an observable way to witness kernel behaviors. UnixSuite resolves this by mapping theoretical concepts directly to C system calls and rendering observable outputs, bridging the gap between theory and practical engineering."
+      </div>
+    </div>
+
+    <!-- ===================================================================
+         SLIDE 4: OBJECTIVES
+         =================================================================== -->
+    <div class="slide-container" id="slide-4">
+      <div>
+        <div class="slide-tag">PROJECT GOALS</div>
+        <h2 class="slide-heading">Primary Project Objectives</h2>
+      </div>
+
+      <div class="slide-content grid-4">
+        <div class="card">
+          <h4><span>1.</span> System Telemetry</h4>
+          <p>Extract OS release, kernel architecture, CPU topology, and page metrics via <code>uname()</code> and <code>sysconf()</code>.</p>
+        </div>
+        <div class="card">
+          <h4><span>2.</span> Process Control</h4>
+          <p>Demonstrate address space cloning via <code>fork()</code>, binary loading via <code>execlp()</code>, and reap via <code>waitpid()</code>.</p>
+        </div>
+        <div class="card">
+          <h4><span>3.</span> VFS Operations</h4>
+          <p>Perform byte stream I/O (<code>open</code>, <code>read</code>, <code>close</code>) and inspect physical inode metadata using <code>stat()</code>.</p>
+        </div>
+        <div class="card">
+          <h4><span>4.</span> IPC via Pipes</h4>
+          <p>Establish unidirectional FIFO kernel channels between parent and child processes using <code>pipe()</code>.</p>
+        </div>
+        <div class="card">
+          <h4><span>5.</span> Signal Dispatch</h4>
+          <p>Install reliable signal handlers with <code>sigaction()</code> and dispatch software interrupts via <code>kill()</code>.</p>
+        </div>
+        <div class="card">
+          <h4><span>6.</span> Memory Maps</h4>
+          <p>Parse <code>/proc/self/status</code> and <code>/proc/self/maps</code> to measure VmSize, VmRSS, and virtual segments.</p>
+        </div>
+        <div class="card">
+          <h4><span>7.</span> Thread Sync</h4>
+          <p>Implement POSIX threads (<code>pthreads</code>) and prove mutual exclusion using <code>pthread_mutex_t</code>.</p>
+        </div>
+        <div class="card">
+          <h4><span>8.</span> Modular C</h4>
+          <p>Maintain clean software architecture, automated compilation via <code>Makefile</code>, and POSIX conformance.</p>
+        </div>
+      </div>
+
+      <div class="notes-drawer" id="notes-4">
+        <strong>🗣️ Speaker Note (Slide 4):</strong> "Our project targeted eight explicit learning objectives covering everything from hardware telemetry and process control to IPC, memory analysis, and multithreading synchronization, all built according to rigorous modular C programming principles."
+      </div>
+    </div>
+
+    <!-- ===================================================================
+         SLIDE 5: TECH STACK & TOOLS
+         =================================================================== -->
+    <div class="slide-container" id="slide-5">
+      <div>
+        <div class="slide-tag">IMPLEMENTATION ENVIRONMENT</div>
+        <h2 class="slide-heading">Technology Stack & System Interfaces</h2>
+      </div>
+
+      <div class="slide-content grid-2">
+        <div class="card">
+          <h4><span>🛠️</span> Core Toolchain & Environment</h4>
+          <table class="pres-table" style="margin-top: 0.3rem;">
+            <tr>
+              <th style="width: 35%;">Layer</th>
+              <th>Specification</th>
+            </tr>
+            <tr>
+              <td><strong>Language</strong></td>
+              <td>C (ISO C99 Standard with <code>_POSIX_C_SOURCE 200809L</code>)</td>
+            </tr>
+            <tr>
+              <td><strong>Compiler</strong></td>
+              <td>GCC (GNU Compiler Collection) with <code>-Wall -Wextra</code></td>
+            </tr>
+            <tr>
+              <td><strong>Platform</strong></td>
+              <td>Linux Kernel 6.x / POSIX-compliant UNIX / WSL2</td>
+            </tr>
+            <tr>
+              <td><strong>Build Tool</strong></td>
+              <td>GNU Make (Automated multi-file compilation)</td>
+            </tr>
+            <tr>
+              <td><strong>Threading</strong></td>
+              <td>POSIX Threads Library (<code>-lpthread</code>)</td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="card">
+          <h4><span>📦</span> Native POSIX / Linux APIs Utilized</h4>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; line-height: 1.6; color: #cbd5e1; margin-top: 0.3rem;">
+            <div>• <strong>Process:</strong> <code>fork()</code>, <code>execlp()</code>, <code>waitpid()</code>, <code>getpid()</code></div>
+            <div>• <strong>File System:</strong> <code>open()</code>, <code>read()</code>, <code>close()</code>, <code>stat()</code></div>
+            <div>• <strong>IPC:</strong> <code>pipe()</code>, <code>write()</code>, <code>read()</code></div>
+            <div>• <strong>Signals:</strong> <code>sigaction()</code>, <code>kill()</code>, <code>sigemptyset()</code></div>
+            <div>• <strong>Memory:</strong> <code>/proc/self/status</code>, <code>sysconf(_SC_PAGESIZE)</code></div>
+            <div>• <strong>Threads:</strong> <code>pthread_create()</code>, <code>pthread_mutex_lock()</code></div>
+          </div>
+          <div style="font-size: 0.75rem; color: var(--accent-emerald); margin-top: 0.4rem;">
+            ✔ Zero third-party dependencies; strictly native POSIX C backend.
+          </div>
+        </div>
+      </div>
+
+      <div class="notes-drawer" id="notes-5">
+        <strong>🗣️ Speaker Note (Slide 5):</strong> "The backend is implemented strictly in C99 using native POSIX and Linux kernel APIs, compiled with GCC and GNU Make. We avoided external frameworks to ensure direct, unmediated communication with the Linux kernel interfaces."
+      </div>
+    </div>
+
+    <!-- ===================================================================
+         SLIDE 6: SYSTEM ARCHITECTURE
+         =================================================================== -->
+    <div class="slide-container" id="slide-6">
+      <div>
+        <div class="slide-tag">SOFTWARE DESIGN</div>
+        <h2 class="slide-heading">Modular System Architecture</h2>
+      </div>
+
+      <div class="slide-content">
+        <!-- Architecture Diagram -->
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <!-- Top Layer -->
+          <div class="flow-bar" style="justify-content: center; background: rgba(56, 189, 248, 0.15); border-color: var(--accent-cyan);">
+            <strong>USER INTERACTION LAYER:</strong> Interactive CLI REPL / Terminal Shell & Visual Web Workbench
+          </div>
+
+          <div style="text-align: center; color: var(--accent-cyan); font-weight: 700;">⬇ User Command Input (`main.c` Command Interpreter)</div>
+
+          <!-- Middle Layer (Modules) -->
+          <div class="grid-3" style="gap: 0.6rem;">
+            <div class="card" style="padding: 0.6rem; text-align: center;">
+              <strong style="color: var(--accent-cyan); font-size: 0.8rem;">system_info.c / .h</strong>
+              <div style="font-size: 0.72rem; color: var(--text-muted);">uname(), sysconf()</div>
+            </div>
+            <div class="card" style="padding: 0.6rem; text-align: center;">
+              <strong style="color: var(--accent-purple); font-size: 0.8rem;">process_manager.c / .h</strong>
+              <div style="font-size: 0.72rem; color: var(--text-muted);">fork(), exec(), waitpid()</div>
+            </div>
+            <div class="card" style="padding: 0.6rem; text-align: center;">
+              <strong style="color: var(--accent-emerald); font-size: 0.8rem;">file_system.c / .h</strong>
+              <div style="font-size: 0.72rem; color: var(--text-muted);">open(), read(), stat()</div>
+            </div>
+            <div class="card" style="padding: 0.6rem; text-align: center;">
+              <strong style="color: var(--accent-amber); font-size: 0.8rem;">ipc.c / .h</strong>
+              <div style="font-size: 0.72rem; color: var(--text-muted);">pipe(), sigaction(), kill()</div>
+            </div>
+            <div class="card" style="padding: 0.6rem; text-align: center;">
+              <strong style="color: var(--accent-blue); font-size: 0.8rem;">memory.c / .h</strong>
+              <div style="font-size: 0.72rem; color: var(--text-muted);">/proc/self/status, maps</div>
+            </div>
+            <div class="card" style="padding: 0.6rem; text-align: center;">
+              <strong style="color: var(--accent-rose); font-size: 0.8rem;">concurrency.c / .h</strong>
+              <div style="font-size: 0.72rem; color: var(--text-muted);">pthread_create, mutex</div>
+            </div>
+          </div>
+
+          <div style="text-align: center; color: var(--accent-cyan); font-weight: 700;">⬇ System Calls & ProcFS Interactions</div>
+
+          <!-- Bottom Layer -->
+          <div class="flow-bar" style="justify-content: center; background: rgba(16, 185, 129, 0.15); border-color: var(--accent-emerald);">
+            <strong>LINUX KERNEL SPACE:</strong> Process Scheduler • Virtual File System (VFS) • Page Tables • IPC Buffers
+          </div>
+        </div>
+      </div>
+
+      <div class="notes-drawer" id="notes-6">
+        <strong>🗣️ Speaker Note (Slide 6):</strong> "This block diagram shows the clean separation of concerns in our architecture. `main.c` acts as the command dispatcher, routing user input to individual modular C subsystems. Each `.c` file contains the implementation while `.h` header files declare clean interfaces."
+      </div>
+    </div>
+
+    <!-- ===================================================================
+         SLIDE 7: COMMAND-LINE INTERFACE
+         =================================================================== -->
+    <div class="slide-container" id="slide-7">
+      <div>
+        <div class="slide-tag">USER INTERFACE</div>
+        <h2 class="slide-heading">Command-Line Interface & REPL</h2>
+      </div>
+
+      <div class="slide-content grid-2">
+        <div class="terminal-box" style="height: 100%;">
+          <div style="color: var(--accent-cyan); font-weight: 700; margin-bottom: 0.3rem;">=== UNIXSUITE INTERACTIVE CLI ===</div>
+          <div><span class="terminal-prompt">UnixSuite ></span> system-info</div>
+          <div style="color: #94a3b8;">[INTERNAL] uname() and sysconf() queried kernel.</div>
+          <div><span class="terminal-prompt">UnixSuite ></span> processes</div>
+          <div style="color: #94a3b8;">[CHILD] fork() created PID 4013 | exec() invoked.</div>
+          <div><span class="terminal-prompt">UnixSuite ></span> file-info test.txt</div>
+          <div style="color: #94a3b8;">Size: 851 B | Permissions: 0644 | Inode metadata ok.</div>
+          <div><span class="terminal-prompt">UnixSuite ></span> thread-demo</div>
+          <div style="color: #10b981;">[RESULT] Expected: 200000 | Actual: 200000 (Mutex Safe)</div>
+          <div><span class="terminal-prompt">UnixSuite ></span> _</div>
+        </div>
+
+        <div class="card">
+          <h4><span>⌨️</span> Command Dispatch Mechanism</h4>
+          <ul style="margin-top: 0.3rem; line-height: 1.55;">
+            <li><strong>REPL Loop:</strong> Continuously reads string tokens via <code>fgets()</code> in <code>main.c</code>.</li>
+            <li><strong>Argument Parsing:</strong> Trims newline delimiters and matches command prefixes (e.g. <code>read-file &lt;filename&gt;</code>).</li>
+            <li><strong>Error Trapping:</strong> Displays instructional usage tips when unrecognized commands are entered.</li>
+            <li><strong>Graceful Teardown:</strong> `exit` terminates the event loop with status code 0.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="notes-drawer" id="notes-7">
+        <strong>🗣️ Speaker Note (Slide 7):</strong> "The terminal interface operates as an interactive REPL loop. Users enter commands such as `system-info`, `processes`, or `thread-demo`, and the dispatcher invokes the corresponding C function, formatting both results and internal working telemetry."
+      </div>
+    </div>
+
+    <!-- ===================================================================
+         SLIDE 8: SYSTEM INFO & FILE MANAGEMENT
+         =================================================================== -->
+    <div class="slide-container" id="slide-8">
+      <div>
+        <div class="slide-tag">MODULES 1 & 3</div>
+        <h2 class="slide-heading">System Information & File Management</h2>
+      </div>
+
+      <div class="slide-content grid-2">
+        <!-- Left: System Info -->
+        <div class="card">
+          <h4><span>🖥️</span> 1. System Information</h4>
+          <ul style="line-height: 1.5; margin-top: 0.2rem;">
+            <li><strong><code>uname(&info)</code></strong>: Fills <code>struct utsname</code> with OS name, release (e.g., 6.6 WSL2), version, and machine architecture (<code>x86_64</code>).</li>
+            <li><strong><code>sysconf(_SC_NPROCESSORS_ONLN)</code></strong>: Retrieves total active CPU cores for multi-core scheduling.</li>
+            <li><strong><code>sysconf(_SC_PAGESIZE)</code></strong>: Queries standard hardware memory page size (4096 Bytes).</li>
+          </ul>
+        </div>
+
+        <!-- Right: File System -->
+        <div class="card">
+          <h4><span>📁</span> 2. File System (VFS & Inodes)</h4>
+          <ul style="line-height: 1.5; margin-top: 0.2rem;">
+            <li><strong><code>stat(path, &st)</code></strong>: Inspects inode metadata without reading file content (size, octal permissions <code>0644</code>, UID/GID).</li>
+            <li><strong><code>open(..., O_CREAT | O_EXCL)</code></strong>: Atomically creates new files and returns an integer File Descriptor (FD).</li>
+            <li><strong><code>read() / close()</code></strong>: Reads raw byte buffers and safely frees the FD slot in the process table.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="notes-drawer" id="notes-8">
+        <strong>🗣️ Speaker Note (Slide 8):</strong> "Here we contrast system information with file management. `uname()` and `sysconf()` query live kernel parameters, while `stat()` extracts physical inode metadata and `open()/read()` demonstrate low-level file descriptor stream I/O."
+      </div>
+    </div>
+
+    <!-- ===================================================================
+         SLIDE 9: PROCESS MANAGEMENT
+         =================================================================== -->
+    <div class="slide-container" id="slide-9">
+      <div>
+        <div class="slide-tag">MODULE 2 DEEP DIVE</div>
+        <h2 class="slide-heading">Process Creation & Lifecycle Management</h2>
+      </div>
+
+      <div class="slide-content grid-2">
+        <div>
+          <ul style="display: flex; flex-direction: column; gap: 0.6rem; list-style: none;">
+            <li class="card" style="padding: 0.6rem;">
+              <strong style="color: var(--accent-cyan);">1. fork() — Address Space Cloning</strong>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Duplicates parent process. Returns <code>0</code> to child and Child PID to parent.</div>
+            </li>
+            <li class="card" style="padding: 0.6rem;">
+              <strong style="color: var(--accent-purple);">2. execlp() — Binary Image Overlay</strong>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Replaces child process text & data segments with new binary (e.g. <code>echo</code>).</div>
+            </li>
+            <li class="card" style="padding: 0.6rem;">
+              <strong style="color: var(--accent-emerald);">3. waitpid() — Synchronization & Status</strong>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Parent blocks until child terminates, inspecting <code>WEXITSTATUS(status)</code> to reap zombie.</div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="code-box">
+<span style="color: #64748b;">// Complete fork-exec-wait flow</span>
+pid_t pid = <span style="color: #38bdf8;">fork</span>();
+
+<span style="color: #f43f5e;">if</span> (pid == 0) {
+    <span style="color: #64748b;">// In Child Process</span>
+    <span style="color: #38bdf8;">execlp</span>("echo", "echo", "[Child] Executed!", NULL);
+    <span style="color: #38bdf8;">_exit</span>(1);
+} <span style="color: #f43f5e;">else</span> {
+    <span style="color: #64748b;">// In Parent Process</span>
+    <span style="color: #38bdf8;">waitpid</span>(pid, &status, 0);
+    <span style="color: #f43f5e;">if</span> (WIFEXITED(status)) {
+        printf("Exit Code: %d\n", WEXITSTATUS(status));
+    }
+}
+        </div>
+      </div>
+
+      <div class="notes-drawer" id="notes-9">
+        <strong>🗣️ Speaker Note (Slide 9):</strong> "It is crucial to distinguish process creation from program execution. `fork()` creates a new process by cloning the parent, while `exec()` replaces the memory image of that process with a new program. The parent uses `waitpid()` to avoid leaving zombie processes."
+      </div>
+    </div>
+
+    <!-- ===================================================================
+         SLIDE 10: INTER-PROCESS COMMUNICATION (IPC)
+         =================================================================== -->
+    <div class="slide-container" id="slide-10">
+      <div>
+        <div class="slide-tag">MODULE 4 DEEP DIVE</div>
+        <h2 class="slide-heading">Inter-Process Communication via Anonymous Pipes</h2>
+      </div>
+
+      <div class="slide-content grid-2">
+        <div class="card">
+          <h4><span>🚰</span> Pipe Communication Mechanism</h4>
+          <ul style="line-height: 1.5; margin-top: 0.3rem;">
+            <li><strong><code>pipe(pipefd[2])</code></strong>: Allocates a unidirectional FIFO buffer in kernel ring memory.</li>
+            <li><strong><code>pipefd[1] (Write End)</code></strong>: Child closes read end (<code>0</code>) and writes message into pipe buffer.</li>
+            <li><strong><code>pipefd[0] (Read End)</code></strong>: Parent closes write end (<code>1</code>) and reads bytes synchronously.</li>
+            <li><strong>Zero Disk Overhead:</strong> Transfers data entirely in memory across process boundaries.</li>
+          </ul>
+        </div>
+
+        <div class="code-box">
+<span style="color: #64748b;">// Pipe IPC Implementation</span>
+int pipefd[2];
+pipe(pipefd); <span style="color: #64748b;">// [0]=Read, [1]=Write</span>
+
+if (fork() == 0) {
+    close(pipefd[0]);
+    write(pipefd[1], "Hello Parent", 13);
+    close(pipefd[1]);
+    _exit(0);
+}
+
+close(pipefd[1]);
+read(pipefd[0], buffer, sizeof(buffer));
+close(pipefd[0]);
+waitpid(pid, NULL, 0);
+        </div>
+      </div>
+
+      <div class="notes-drawer" id="notes-10">
+        <strong>🗣️ Speaker Note (Slide 10):</strong> "Anonymous pipes provide unidirectional byte streaming between related processes. The child writes into `pipefd[1]`, and the parent reads from `pipefd[0]`. Unused file descriptors are closed to ensure proper end-of-file signaling."
+      </div>
+    </div>
+
+    <!-- ===================================================================
+         SLIDE 11: SIGNAL HANDLING
+         =================================================================== -->
+    <div class="slide-container" id="slide-11">
+      <div>
+        <div class="slide-tag">MODULE 4 PART B</div>
+        <h2 class="slide-heading">Signal Handling & Asynchronous Notifications</h2>
+      </div>
+
+      <div class="slide-content grid-2">
+        <div class="card">
+          <h4><span>⚡</span> POSIX Signal Architecture</h4>
+          <ul style="line-height: 1.5; margin-top: 0.3rem;">
+            <li><strong>Signals vs Pipes:</strong> Signals are asynchronous interrupts that notify a process of an event rather than transmitting large data streams.</li>
+            <li><strong><code>sigaction()</code></strong>: Installs reliable signal handler for <code>SIGUSR1</code> with clear signal masks.</li>
+            <li><strong><code>kill(pid, SIGUSR1)</code></strong>: Sends signal to target PID (does not necessarily terminate the process).</li>
+            <li><strong><code>volatile sig_atomic_t</code></strong>: Ensures atomic read/write of shared signal flag variables.</li>
+          </ul>
+        </div>
+
+        <div class="code-box">
+<span style="color: #64748b;">// Signal Registration & Dispatch</span>
+static volatile sig_atomic_t flag = 0;
+
+void handle_sigusr1(int sig) {
+    flag = 1; <span style="color: #64748b;">// Atomic signal handler update</span>
+}
+
+struct sigaction sa;
+sa.sa_handler = handle_sigusr1;
+sigemptyset(&sa.sa_mask);
+sigaction(SIGUSR1, &sa, NULL);
+
+<span style="color: #64748b;">// Send signal to self</span>
+kill(getpid(), SIGUSR1);
+        </div>
+      </div>
+
+      <div class="notes-drawer" id="notes-11">
+        <strong>🗣️ Speaker Note (Slide 11):</strong> "Signals allow processes to handle asynchronous events. We use `sigaction()` rather than the legacy `signal()` API for portable, reliable handler registration, and declare our handler flags as `volatile sig_atomic_t` for thread-safe atomicity."
+      </div>
+    </div>
+
+    <!-- ===================================================================
+         SLIDE 12: MEMORY ANALYSIS
+         =================================================================== -->
+    <div class="slide-container" id="slide-12">
+      <div>
+        <div class="slide-tag">MODULE 5 DEEP DIVE</div>
+        <h2 class="slide-heading">Virtual Memory Architecture & /proc Telemetry</h2>
+      </div>
+
+      <div class="slide-content grid-2">
+        <!-- Left: Segments -->
+        <div class="card">
+          <h4><span>📐</span> Linux Virtual Address Space Layout</h4>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.74rem; display: flex; flex-direction: column; gap: 0.25rem; margin-top: 0.2rem;">
+            <div style="background: rgba(244, 63, 94, 0.2); padding: 3px 6px; border-radius: 4px;">Kernel Space (0xFFFF8000...)</div>
+            <div style="background: rgba(99, 102, 241, 0.2); padding: 3px 6px; border-radius: 4px;">Stack (Grows Downward ↓) [Local Variables]</div>
+            <div style="background: rgba(6, 182, 212, 0.2); padding: 3px 6px; border-radius: 4px;">Memory Mapping Segment (Shared Libs, libc.so)</div>
+            <div style="background: rgba(16, 185, 129, 0.2); padding: 3px 6px; border-radius: 4px;">Heap (Grows Upward ↑) [malloc / brk]</div>
+            <div style="background: rgba(245, 158, 11, 0.2); padding: 3px 6px; border-radius: 4px;">BSS & Data Segments (Globals)</div>
+            <div style="background: rgba(59, 130, 246, 0.2); padding: 3px 6px; border-radius: 4px;">Text Segment (Executable Machine Code [r-xp])</div>
+          </div>
+        </div>
+
+        <!-- Right: /proc status -->
+        <div class="card">
+          <h4><span>📊</span> /proc/self/status Metrics</h4>
+          <ul style="line-height: 1.5; margin-top: 0.2rem;">
+            <li><strong>VmSize vs VmRSS:</strong> <code>VmSize</code> is the total allocated virtual space; <code>VmRSS</code> (Resident Set Size) is the actual physical RAM loaded.</li>
+            <li><strong>VmPeak:</strong> Peak virtual memory consumption during process lifetime.</li>
+            <li><strong>VmData & VmStk:</strong> Exact virtual memory dedicated to data segments and stack frames.</li>
+            <li><strong>/proc/self/maps:</strong> Lists address ranges, page permissions (<code>r-xp</code>, <code>rw-p</code>), and mapped file offsets.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="notes-drawer" id="notes-12">
+        <strong>🗣️ Speaker Note (Slide 12):</strong> "Our memory module inspects `/proc/self/status` and `/proc/self/maps`. Crucially, we emphasize that virtual memory (VmSize) and physical resident memory (VmRSS) are not interchangeable—VmRSS represents the exact physical memory pages currently mapped in hardware RAM."
+      </div>
+    </div>
+
+    <!-- ===================================================================
+         SLIDE 13: CONCURRENCY & THREADS
+         =================================================================== -->
+    <div class="slide-container" id="slide-13">
+      <div>
+        <div class="slide-tag">MODULE 6 DEEP DIVE</div>
+        <h2 class="slide-heading">Multithreading, Concurrency & Mutex Synchronization</h2>
+      </div>
+
+      <div class="slide-content grid-2">
+        <div class="card">
+          <h4><span>🧵</span> POSIX Threads & Shared Memory</h4>
+          <ul style="line-height: 1.5; margin-top: 0.3rem;">
+            <li><strong>Shared Address Space:</strong> Unlike processes, threads created with <code>pthread_create()</code> share the same heap and global memory.</li>
+            <li><strong>Critical Section:</strong> Incrementing <code>shared_counter++</code> involves three CPU instructions: <em>Read ➔ Modify ➔ Write</em>.</li>
+            <li><strong>Race Conditions:</strong> Unsynchronized thread interleaving causes missed increments.</li>
+            <li><strong>Mutex Locking:</strong> <code>pthread_mutex_lock()</code> forces mutual exclusion, guaranteeing exactly 200,000 increments.</li>
+          </ul>
+        </div>
+
+        <div class="code-box">
+<span style="color: #64748b;">// Worker Function with Mutex Protection</span>
+void *worker(void *arg) {
+    for (int i = 0; i < 100000; i++) {
+        pthread_mutex_lock(&counter_mutex);
+        shared_counter++; <span style="color: #64748b;">// Critical Section</span>
+        pthread_mutex_unlock(&counter_mutex);
+    }
+    return NULL;
+}
+
+<span style="color: #64748b;">// Result: Expected 200,000 | Actual 200,000</span>
+        </div>
+      </div>
+
+      <div class="notes-drawer" id="notes-13">
+        <strong>🗣️ Speaker Note (Slide 13):</strong> "In multithreading, multiple threads share a single process's memory. When two threads concurrently increment a counter without synchronization, a race condition occurs. Enclosing the increment inside a mutex lock guarantees mutual exclusion and 100% data integrity."
+      </div>
+    </div>
+
+    <!-- ===================================================================
+         SLIDE 14: DEMONSTRATION & RESULTS
+         =================================================================== -->
+    <div class="slide-container" id="slide-14">
+      <div>
+        <div class="slide-tag">EVALUATION & VERIFICATION</div>
+        <h2 class="slide-heading">Demonstration Plan, Results & Observations</h2>
+      </div>
+
+      <div class="slide-content">
+        <table class="pres-table">
+          <thead>
+            <tr>
+              <th>Feature Command</th>
+              <th>Concept Demonstrated</th>
+              <th>Expected Observation (Verified in C Backend)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>system-info</code></td>
+              <td>Kernel & Hardware Discovery</td>
+              <td>Displays Linux kernel release, active CPU core count, and page size (4096 B).</td>
+            </tr>
+            <tr>
+              <td><code>processes</code></td>
+              <td>Process Cloning & Execution</td>
+              <td>Child prints PID, executes <code>echo</code> via <code>execlp</code>, and parent reaps exit status 0.</td>
+            </tr>
+            <tr>
+              <td><code>file-info / read-file</code></td>
+              <td>VFS & Inode Metadata</td>
+              <td>Shows <code>stat()</code> attributes (permissions 0644, size) and reads byte streams via FD 3.</td>
+            </tr>
+            <tr>
+              <td><code>ipc-demo / signal-demo</code></td>
+              <td>Pipes & Asynchronous Signals</td>
+              <td>39-byte payload transmitted over pipe; <code>SIGUSR1</code> intercepted by signal handler.</td>
+            </tr>
+            <tr>
+              <td><code>thread-demo</code></td>
+              <td>Mutex Synchronization</td>
+              <td>2 worker threads perform 100,000 iterations each; counter reaches exact 200,000.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="card" style="margin-top: 0.5rem; padding: 0.6rem;">
+          <strong style="color: var(--accent-amber); font-size: 0.8rem;">⚠️ Practical Constraints & Scope:</strong>
+          <span style="font-size: 0.78rem; color: var(--text-muted);">
+            Designed for POSIX/Linux systems (ProcFS and signal semantics vary on Windows/macOS). File operations strictly enforce Unix permission bits.
+          </span>
+        </div>
+      </div>
+
+      <div class="notes-drawer" id="notes-14">
+        <strong>🗣️ Speaker Note (Slide 14):</strong> "This table summarizes our live demonstration plan. Every feature has been compiled and verified on Linux. In our demonstration, we will show command execution in the terminal alongside our companion visual dashboard."
+      </div>
+    </div>
+
+    <!-- ===================================================================
+         SLIDE 15: CONCLUSION & FUTURE SCOPE
+         =================================================================== -->
+    <div class="slide-container" id="slide-15">
+      <div>
+        <div class="slide-tag">PROJECT SUMMARY</div>
+        <h2 class="slide-heading">Conclusion & Future Enhancements</h2>
+      </div>
+
+      <div class="slide-content grid-2">
+        <div class="card" style="border-left: 3px solid var(--accent-emerald);">
+          <h4 style="color: var(--accent-emerald);"><span>🏆</span> Key Project Accomplishments</h4>
+          <ul style="margin-top: 0.3rem; line-height: 1.55;">
+            <li><strong>Unified Architecture:</strong> Successfully combined 6 fundamental OS domains into one modular, cohesive C99 toolkit.</li>
+            <li><strong>Pedagogical Value:</strong> Embedded internal telemetry and companion visual simulators clarify abstract kernel concepts.</li>
+            <li><strong>Robust Engineering:</strong> Adheres to POSIX standards with clean memory management and error handling.</li>
+          </ul>
+        </div>
+
+        <div class="card" style="border-left: 3px solid var(--accent-cyan);">
+          <h4 style="color: var(--accent-cyan);"><span>🚀</span> Proposed Future Enhancements</h4>
+          <ul style="margin-top: 0.3rem; line-height: 1.55;">
+            <li><strong>Network IPC:</strong> Implement client-server TCP/UDP socket communication.</li>
+            <li><strong>I/O Multiplexing:</strong> Add event-driven I/O polling using <code>epoll()</code> and <code>select()</code>.</li>
+            <li><strong>Shared Memory:</strong> Introduce POSIX shared memory (<code>shm_open</code> / <code>mmap</code>) with semaphores.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-top: 1rem; font-size: 1.3rem; font-weight: 800; color: var(--accent-cyan);">
+        Thank You! • Questions & Discussion
+      </div>
+
+      <div class="notes-drawer" id="notes-15">
+        <strong>🗣️ Speaker Note (Slide 15):</strong> "In conclusion, UnixSuite successfully implements a modular, educational Linux system programming suite in C. For future work, we plan to extend the toolkit with network sockets and epoll I/O multiplexing. Thank you, and we are now ready for your questions."
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Navigation Controls -->
+  <footer class="pres-footer">
+    <button class="btn-nav" id="prev-btn" onclick="prevSlide()">◀ Previous (Left Arrow)</button>
+    <div class="key-tip">Navigate: [ ◀ / ▶ Arrow Keys ] • Toggle Notes: [ S Key ]</div>
+    <button class="btn-nav" id="next-btn" onclick="nextSlide()">Next (Right Arrow) ▶</button>
+  </footer>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 15;
+    let notesOpen = false;
+
+    function showSlide(index) {
+      if (index < 1) index = 1;
+      if (index > totalSlides) index = totalSlides;
+      currentSlide = index;
+
+      document.querySelectorAll('.slide-container').forEach((s, i) => {
+        if (i + 1 === currentSlide) {
+          s.classList.add('active');
+        } else {
+          s.classList.remove('active');
+        }
+      });
+
+      document.getElementById('slide-indicator').textContent = `Slide ${currentSlide} / ${totalSlides}`;
+      document.getElementById('prev-btn').disabled = (currentSlide === 1);
+      document.getElementById('next-btn').disabled = (currentSlide === totalSlides);
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) showSlide(currentSlide + 1);
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) showSlide(currentSlide - 1);
+    }
+
+    function toggleSpeakerNotes() {
+      notesOpen = !notesOpen;
+      document.querySelectorAll('.notes-drawer').forEach(drawer => {
+        if (notesOpen) {
+          drawer.classList.add('open');
+        } else {
+          drawer.classList.remove('open');
+        }
+      });
+      document.getElementById('toggle-notes-btn').style.background = notesOpen ? 'rgba(245, 158, 11, 0.2)' : '';
+      document.getElementById('toggle-notes-btn').style.borderColor = notesOpen ? 'var(--accent-amber)' : '';
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'Space') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        prevSlide();
+      } else if (e.key === 's' || e.key === 'S') {
+        toggleSpeakerNotes();
+      }
+    });
+
+    showSlide(1);
+  </script>
+</body>
+</html>
