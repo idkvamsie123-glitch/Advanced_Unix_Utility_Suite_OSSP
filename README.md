@@ -9,10 +9,10 @@
 ---
 
 ## 👥 Team Members (CSE Department)
-* **2610030236** I D K Vamshie
-* **2510030261** Kotta Sai Srinath
-* **2510030041** V.Keerthana
-* **2510030228** K.Akhila
+* **2610030236** — IDK VAMSIE
+* **2510030261** — K Sai Srinath
+* **2510030041** — KEERTHANA V
+* **2510030228** — KATKAM AKHILA
 
 ---
 
